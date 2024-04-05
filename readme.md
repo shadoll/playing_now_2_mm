@@ -14,7 +14,7 @@ This is a Python application that fetches the currently playing track from eithe
 - Mattermost
 
 ## Environment Variables
-`MUSIC_APP` - This variable determines which music service the application will fetch the currently playing track from. It can be either `apple_music` or `spotify`.
+`MUSIC_APP` - This variable determines which music service the application will fetch the currently playing track from. It can be set to `autodetect` to automatically detect the running music application.
 `MATTERMOST_SERVER_URL` variable represents the URL of the Mattermost server.
 `MATTERMOST_ACCESS_TOKEN` the access token for the Mattermost API, which is obtained by generating a personal access token from the Mattermost user settings and is used to authenticate and authorize API requests to the Mattermost server.
 

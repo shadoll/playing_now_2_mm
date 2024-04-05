@@ -2,28 +2,21 @@ from datetime import datetime
 import time
 from music import Music
 from mattermost import Mattermost
-from connectors.apple_music import AppleMusic
-from connectors.spotify import Spotify
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
 SLEEP_TIME = 3
 
-MUSIC_APP = (
-    os.getenv("MUSIC_APP", "apple_music").replace("_", " ").title().replace(" ", "")
-)
-print(f"Using 📀 {MUSIC_APP} connector")
-
 def playing_now() -> tuple:
-    music = Music(connector=globals()[MUSIC_APP])
+    music = Music()
     return music.get_current_track_info()
 
 
 def set_now_playing(name, artist, duration):
     now = datetime.now().strftime("%H:%M:%S")
-    print(f"{now} 🎧 {name} - {artist} ⏱️ {duration}")
+    duration = int(duration) if duration else 0
+    print(f"{now} 🎧 {name} - {artist} ⏱️  {duration} seconds")
     if name and artist and duration:
         Mattermost().set_now_playing(name, artist, duration)
 
