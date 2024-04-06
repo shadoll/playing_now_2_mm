@@ -2,3 +2,5 @@ python-dotenv
 requests
 appscript
 osascript
+faker
+emoji

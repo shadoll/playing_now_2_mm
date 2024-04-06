@@ -1,37 +1,65 @@
-from datetime import datetime
-import time
-from music import Music
-from mattermost import Mattermost
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
+from mattermost import Mattermost
+from processors.music import MusicProcessor
+from processors.text import TextProcessor
+import argparse
+import time
 
 load_dotenv()
 
 SLEEP_TIME = 3
 
-def playing_now() -> tuple:
-    music = Music()
-    return music.get_current_track_info()
+
+def get_status(source: str | None = None) -> dict:
+    if source == "random":
+        activity, emoji, duration = TextProcessor(source=source).get_satus()
+        return {
+            "status": activity,
+            "emoji": emoji.replace(":", ""),
+            "expires_at": datetime.now(timezone.utc) + timedelta(minutes=duration),
+            "ending_time": duration * 60,
+        }
+    if source == "music":
+        track, artist, duration, elapsed_time = (
+            MusicProcessor().get_current_track_info()
+        )
+        if track and artist and duration:
+            now = datetime.now(timezone.utc)
+            print(f"{now} 🎧 {track} - {artist}")
+            expires_at = (
+                now + timedelta(seconds=duration) - timedelta(seconds=elapsed_time)
+            ).astimezone()
+            return {
+                "status": f"{track} - {artist}",
+                "emoji": "headphones",
+                "expires_at": expires_at,
+                "ending_time": duration - elapsed_time,
+            }
+    return {
+        "status": None,
+        "emoji": None,
+        "expires_at": None,
+        "ending_time": None,
+    }
 
 
-def set_now_playing(name, artist, duration):
-    now = datetime.now().strftime("%H:%M:%S")
-    duration = int(duration) if duration else 0
-    print(f"{now} 🎧 {name} - {artist} ⏱️  {duration} seconds")
-    if name and artist and duration:
-        Mattermost().set_now_playing(name, artist, duration)
+def send_user_status(status, emoji, expires_at=None, **kwargs):
+    Mattermost().set_status(status, emoji, expires_at=expires_at)
 
 
-def main():
-    name_curr, artist_curr, duration_curr = playing_now()
-    set_now_playing(name_curr, artist_curr, duration_curr)
-
+def main(source: str | None = "music"):
+    status_curr = {"status": None}
     while True:
-        name, artist, duration = playing_now()
-        if name != name_curr:
-            set_now_playing(name, artist, duration)
-            name_curr = name
-        time.sleep(SLEEP_TIME)
+        status = get_status(source)
+        if status.get("status") != status_curr.get("status"):
+            send_user_status(**status)
+            status_curr = status
+        time.sleep(status.get("ending_time") or SLEEP_TIME)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", help="source to use for connector", default="music")
+    args = parser.parse_args()
+    main(args.source)
