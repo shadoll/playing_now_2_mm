@@ -14,16 +14,18 @@ This is a Python application that fetches the currently playing track from eithe
 - Mattermost
 
 ## Environment Variables
-`MUSIC_APP` - This variable determines which music service the application will fetch the currently playing track from. It can be set to `autodetect` to automatically detect the running music application.
+`SOURCE` - This variable determines which music service the application will fetch the currently playing track from. It can be set to `autodetect` to automatically detect the running music application.
+
 `MATTERMOST_SERVER_URL` variable represents the URL of the Mattermost server.
+
 `MATTERMOST_ACCESS_TOKEN` the access token for the Mattermost API, which is obtained by generating a personal access token from the Mattermost user settings and is used to authenticate and authorize API requests to the Mattermost server.
 
 ## How to Run
 1. Clone the repository
 2. Install the dependencies with `pip install -r requirements.txt`
 3. Set Mattermost token and host in `.env`
-4. Set the `MUSIC_APP` environment variable to your preferred music service
-5. Run the application with `python music_app.py`
+4. Set the `SOURCE` environment variable to your preferred music service
+5. Run the application with `python main.py`
 
 ## Note
 The application runs in an infinite loop, constantly checking for changes in the currently playing track and updating your Mattermost status accordingly.

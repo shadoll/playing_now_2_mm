@@ -1,20 +1,18 @@
 import subprocess
 from connectors.apple_music import AppleMusic
 from connectors.spotify import Spotify
-import os
-from dotenv import load_dotenv
 
 
 class MusicProcessor:
-    def __init__(self):
-        load_dotenv()
-        self.music_app = os.getenv("MUSIC_APP", "autodetect")
-        if self.music_app == "autodetect":
-            self.music_app = self.get_current_music_player()
+    def __init__(self, source: str | None = None):
+        self.source: str | None = source
         self.connector: Spotify | AppleMusic | None = self.get_connector()
 
     def get_connector(self) -> Spotify | AppleMusic | None:
-        match self.music_app:
+        if self.source == "autodetect":
+            self.source = self.get_current_music_player()
+
+        match self.source:
             case "spotify":
                 return Spotify()
             case "apple_music":
@@ -23,10 +21,10 @@ class MusicProcessor:
                 print("Active music player not found")
                 return None
 
-    def get_current_track_info(self) -> tuple:
+    def get_status(self) -> dict:
         if self.connector:
-            return self.connector.get_current_track_info()
-        return None, None, None, None
+            return self.connector.get()
+        return {}
 
     @staticmethod
     def get_current_music_player():
@@ -50,6 +48,4 @@ class MusicProcessor:
             player = "apple_music"
         else:
             player = None
-
-        # print(f"Detected 📀 player: {player}")
         return player

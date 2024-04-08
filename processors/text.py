@@ -1,18 +1,19 @@
-from connectors.random import Random
+from connectors.random import RandomConnector
 
 
 class TextProcessor:
     def __init__(self, source: str | None = None):
         self.source: str | None = source
-        self.connector = self.get_connector()
+        self.connector: RandomConnector | None = self.get_connector()
 
-    def get_connector(self):
+    def get_connector(self) -> RandomConnector | None:
         if self.source == "random":
-            return Random()
+            return RandomConnector()
         else:
-            raise ValueError("Invalid source")
+            print("Invalid source")
+            return None
 
-    def get_satus(self) -> tuple:
+    def get_status(self) -> dict:
         if self.connector:
-            return self.connector.get_random_activity()
-        return None, None, None
+            return self.connector.get()
+        return {}
