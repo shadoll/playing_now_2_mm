@@ -2,6 +2,7 @@ import requests
 
 class GitlabConnector:
     def __init__(self, connection_config) -> None:
+        self.NAME = "GitLab"
         self.url = connection_config.get("url", "https://gitlab.com")
         self.token = connection_config.get("token", "")
         self.connect()

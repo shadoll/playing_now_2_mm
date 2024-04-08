@@ -2,6 +2,7 @@ import requests
 
 class MattermostConnector:
     def __init__(self, connection_config) -> None:
+        self.NAME = "Mattermost"
         self.url = connection_config.get("url", "https://mattermost.com")
         self.token = connection_config.get("token", "")
         self.connect(connection_config.get("user_id", "me"))
