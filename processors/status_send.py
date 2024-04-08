@@ -44,7 +44,8 @@ class StatusSend:
                 "expires_at": expires_at.isoformat() if expires_at else None,
             }
             now = time.strftime("%H:%M:%S", time.localtime())
-            print(f"{now} Setting status to {self.destination.capitalize()} of {emoji.get("icon")} {text} ⏱️ for {duration} seconds")
+            remaining_time = round(kwargs.get("remaining_time", 0))
+            print(f"{now} Setting status to {self.connector.NAME} of {emoji.get("icon")} {text} ⏱️  for {remaining_time} seconds")
             try:
                 self.connector.send(data=data)
             except Exception as e:

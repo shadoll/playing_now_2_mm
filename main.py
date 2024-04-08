@@ -38,7 +38,10 @@ def main(source: str = "autodetect", destination: str = "mattermost"):
             status_curr = status
             if not status_result:
                 continue
-        time.sleep(status.get("duration") or SLEEP_TIME)
+        sleep = status.get("remaining_time") or status.get("duration")
+        if sleep is None or sleep <= 0:
+            sleep = SLEEP_TIME
+        time.sleep(sleep)
 
 
 if __name__ == "__main__":
