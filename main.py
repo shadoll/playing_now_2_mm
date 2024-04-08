@@ -20,25 +20,21 @@ def get_status(source: str | None = None) -> dict:
     return {}
 
 
-def send_user_status(**kwargs) -> bool:
+def send_user_status(destination: str |None = None, status = {}) -> bool:
     try:
-        now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        print(
-            f"{now} Setting Mattermost status to {kwargs.get('emoji',{}).get('icon','')} {kwargs.get('text')} ⏱️ for {kwargs.get('duration')} seconds"
-        )
-        StatusSend().set_status(**kwargs)
+        StatusSend(destination=destination).set_status(**status)
         return True
     except Exception as e:
         print(e)
         return False
 
 
-def main(source: str = "autodetect"):
+def main(source: str = "autodetect", destination: str = "mattermost"):
     status_curr = {"status": None}
     while True:
         status = get_status(source)
         if status.get("text", "") != status_curr.get("text", ""):
-            status_result = send_user_status(**status)
+            status_result = send_user_status(destination=destination, status=status)
             status_curr = status
             if not status_result:
                 continue
@@ -47,11 +43,15 @@ def main(source: str = "autodetect"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    # Source can be "autodetect", "spotify", "apple_music", "random"
+    # Source can be "env", "autodetect", "spotify", "apple_music", "random"
+    parser.add_argument("--source", help="source to use for connector", default="env")
+    # Destination can be "env", "mattermost", "gitlab"
     parser.add_argument(
-        "--source", help="source to use for connector", default="autodetect"
+        "--destination", help="destination to use for connector", default="env"
     )
     args = parser.parse_args()
     if args.source == "env":
         args.source = os.getenv("SOURCE", "autodetect")
-    main(args.source)
+    if args.destination == "env":
+        args.destination = os.getenv("DESTINATION", "mattermost")
+    main(args.source, args.destination)

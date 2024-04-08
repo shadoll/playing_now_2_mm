@@ -4,7 +4,7 @@ from connectors.spotify import Spotify
 
 
 class MusicProcessor:
-    def __init__(self, source: str | None = None):
+    def __init__(self, source: str | None = None) -> None:
         self.source: str | None = source
         self.connector: Spotify | AppleMusic | None = self.get_connector()
 
